@@ -1,9 +1,12 @@
 # Leaflet OverPass Layer
 
-This plugin is a fork of https://github.com/kartenkarsten/leaflet-layer-overpass
+This plugin is a fork of https://github.com/GuillaumeAmat/leaflet-overpass-layer forked by https://github.com/kartenkarsten/leaflet-layer-overpass
 
 ## What is it?
 A [Leaflet](http://leafletjs.com/) plugin to create a custom POI overlay - thanks to the [OSM](http://www.openstreetmap.org/) dataset and the [Overpass API](http://overpass-api.de/)
+
+This fork will provide a more extensible version with more options and a deeper implementation of
+overpass features.
 
 
 ## Installation

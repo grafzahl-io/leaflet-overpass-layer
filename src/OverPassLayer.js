@@ -6,7 +6,7 @@ import './MinZoomIndicator';
 const OverPassLayer = L.FeatureGroup.extend({
   options: {
     debug: false,
-    minZoom: 15,
+    minZoom: 13,
     endPoint: 'https://overpass-api.de/api/',
     query: '(node({{bbox}})[organic];node({{bbox}})[second_hand];);out qt;',
     loadedBounds: [],
@@ -22,6 +22,7 @@ const OverPassLayer = L.FeatureGroup.extend({
     onSuccess(data) {
       for (let i = 0; i < data.elements.length; i++) {
         let pos;
+        let wpos;
         let marker;
         const e = data.elements[i];
 
@@ -31,27 +32,44 @@ const OverPassLayer = L.FeatureGroup.extend({
 
         this._ids[e.id] = true;
 
-        if (e.type === 'node') {
+        if (e.type === 'node' && this.options.query.indexOf('node') !== -1) {
           pos = L.latLng(e.lat, e.lon);
+
+          marker = this._getMarkerObject(pos, e);
+          const popupContent = this._getPoiPopupHTML(e.tags, e.id);
+          const popup = L.popup().setContent(popupContent);
+          marker.bindPopup(popup);
+
+          this._markers.addLayer(marker);
+        } else if(e.type === 'way') {
+          let waylist = [];
+          if(e.geometry !== undefined) {
+            for(let j = 0; j < e.geometry.length; j++) {
+              wpos = L.latLng(e.geometry[j].lat, e.geometry[j].lon);
+              this._ids[e.geometry[j].id] = true;
+              waylist.push(wpos);
+            }
+            if(waylist.length > 0) {
+             let firstpolyline = new L.Polyline(waylist, {
+                color: '#53c0d7',
+                weight: 3,
+                opacity: 0.5,
+                smoothFactor: 1
+
+              });
+              this._ways.addLayer(firstpolyline);
+            }
+          }
         } else {
-          pos = L.latLng(e.center.lat, e.center.lon);
+          if(e.type !== 'node' && e.type !== 'way'
+            && e.center !== undefined) {
+            pos = L.latLng(e.center.lat, e.center.lon);
+            /**
+             * missing definition to 
+             * set marker
+             */
+          }
         }
-
-        if (this.options.markerIcon) {
-          marker = L.marker(pos, { icon: this.options.markerIcon });
-        } else {
-          marker = L.circle(pos, 20, {
-            stroke: false,
-            fillColor: '#E54041',
-            fillOpacity: 0.9
-          });
-        }
-
-        const popupContent = this._getPoiPopupHTML(e.tags, e.id);
-        const popup = L.popup().setContent(popupContent);
-        marker.bindPopup(popup);
-
-        this._markers.addLayer(marker);
       }
     },
 
@@ -73,6 +91,18 @@ const OverPassLayer = L.FeatureGroup.extend({
     this._ids = {};
     this._loadedBounds = options.loadedBounds || [];
     this._requestInProgress = false;
+  },
+
+  _getMarkerObject(pos, e) {
+    if (this.options.markerIcon) {
+      return L.marker(pos, { icon: this.options.markerIcon });
+    } else {
+      return L.circle(pos, 20, {
+        stroke: false,
+        fillColor: '#af2560',
+        fillOpacity: 1
+      });
+    }
   },
 
   _getPoiPopupHTML(tags, id) {
@@ -403,6 +433,8 @@ const OverPassLayer = L.FeatureGroup.extend({
     }
 
     this._markers = L.featureGroup().addTo(this._map);
+
+    this._ways = L.featureGroup().addTo(this._map);
 
     if (!this.options.noInitialRequest) {
       this._prepareRequest();
