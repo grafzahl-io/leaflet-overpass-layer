@@ -72,7 +72,7 @@ declare module 'leaflet' {
 		endpoint?: string;
 		query: string;
 		loadedBounds?: L.LatLngBounds; // could be also LatLngBoundsLiteral
-		markerIcon?: string|null;
+		markerIcon?: L.Icon;
 		timeout?: number;
 		retryOnTimeout?: boolean;
 		noInitialRequest?: boolean;

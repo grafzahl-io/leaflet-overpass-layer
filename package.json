@@ -1,7 +1,7 @@
 {
   "name": "leaflet-overpass-layer",
   "description": "This is an simple way to bring OSM data as POI overlay on your leaflet Map",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "homepage": "https://github.com/grafzahl-io/leaflet-overpass-layer",
   "repository": "https://github.com/grafzahl-io/leaflet-overpass-layer",
   "bugs": "https://github.com/grafzahl-io/leaflet-overpass-layer/issues",
